@@ -9,15 +9,16 @@ var wordBlanks = ''
 var alphArray = ''
 var alphabet = ''
 var remaining = ''
+var wins = 0
+var losses = 0
 
 alphabet = 'a b c d e f g h i j k l m n o p q r s t u v w x y z';
 document.getElementById('alphabet').innerHTML = alphabet
 alphArray = Array.from(alphabet);
 window.addEventListener('keydown', checkKeyPress);
 var counter = document.querySelector("#timer");
-remaining = 10;  
-counter.textContent = remaining + " guesses";
-
+document.getElementById('wins').innerHTML = 'Wins: ' + wins
+document.getElementById('losses').innerHTML = 'Losses: ' + losses
 function getApi() {
     let requestUrl = 'https://random-word-api.herokuapp.com/word;'
 
@@ -26,7 +27,7 @@ function getApi() {
             return response.json();
         })
         .then(function(data){
-        console.log(data);
+        console.log('data:',data);
         word = data;
         console.log('word', word);
         dataString = word.toString();
@@ -34,8 +35,7 @@ function getApi() {
         length = dataString.length;
         console.log('length:', length);
         dataArray = Array.from(dataString);
-        console.log('dataArray', dataArray)
-        
+        console.log('dataArray', dataArray) 
     } )
 }
 getApi();
@@ -54,10 +54,11 @@ function setWord() {
         wordBlanks =  wordBlanks.concat(underScores);
     }
         document.getElementById('wordBlanks').innerHTML = wordBlanks;
+        remaining = length + 2;
+        timer.textContent = remaining + " guesses";
+        console.log('remaining:', remaining)
 
 }
-
-
 
 function checkKeyPress(event) {
 
@@ -65,7 +66,6 @@ function checkKeyPress(event) {
     console.log('index:', index)
     code = event.key;
     console.log('code:', code)
-
 
     for (let i = 0; i < alphArray.length; i++) 
         if (alphArray[i] === code) {
@@ -75,7 +75,7 @@ function checkKeyPress(event) {
         }
         console.log('length of alphArray:', alphArray.length)
         
-        onkeydown =
+        onkeydown = 
         remaining--;
         timer.textContent = remaining + " guesses";
         gamePlay()
@@ -85,35 +85,38 @@ function gamePlay() {
     for (let i = 0; i < dataArray.length; i++)
         if (dataArray[i] === code) {
          wordBlanks = replaceAt(wordBlanks, i*2, code);
-         console.log(wordBlanks);
+         console.log('wordBlanks', wordBlanks);
          console.log("letter matched");
          document.getElementById('wordBlanks').innerHTML = wordBlanks;
-         gameWon();
         }
-    }
+        gameOver();
+        }
+         
+   function gameOver()  {   
+        let compare = dataString.split('').join(' ') + (' ');
+         console.log('compare:', compare.length)
+         console.log('wordblanks', wordBlanks.length)
+         
+         if ((remaining >= 0) && (wordBlanks===compare)){
+            //alert('you won')
+            wins++
+            console.log('Wins:', wins)
+            document.getElementById('wins').innerHTML = 'Wins: ' + wins
+            
 
-function gameWon(){
-    if (wordBlanks === dataString){
-    document.getElementById('word').innerHTML = "You Won!"
-    }
-    else if (remaining === 0) {
-     document.getElementById('word').innerHTML = 'Game Over'
-     document.getElementById('wordblanks').innerHTML = dataString
-    }
-}
+         }
+         else if (remaining === 0){
+            //alert('game over')
+            console.log('Losses:', losses)
+            losses++
+            alert('haha loserrr')
+            timer.textContent = 'you suck';
+            document.getElementById('wordBlanks').innerHTML = dataString
+            document.getElementById('losses').innerHTML = 'Losses: ' + losses
+        }}
+
+
 function replaceAt(str, idx, code)
 {
     return str.substring(0, idx) + code + str.substring(idx + 1);   
 }
-
-//function setTime() {
-//     var timer = document.querySelector("#timer");
-//     remaining = 60;  
-//     gameClock = setInterval(function() {
-//     remaining--;
-//     timer.textContent = remaining + " seconds";
-//     if(remaining === 0) {
-//       clearInterval(gameClock);
-//     }
-//   }, 1000);
-// }
