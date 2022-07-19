@@ -11,14 +11,22 @@ var alphabet = ''
 var remaining = ''
 var wins = 0
 var losses = 0
+var currentWins = ''
+var currentLosses = ''
 
 alphabet = 'a b c d e f g h i j k l m n o p q r s t u v w x y z';
 document.getElementById('alphabet').innerHTML = alphabet
 alphArray = Array.from(alphabet);
 window.addEventListener('keydown', checkKeyPress);
 var counter = document.querySelector("#timer");
-document.getElementById('wins').innerHTML = 'Wins: ' + wins
-document.getElementById('losses').innerHTML = 'Losses: ' + losses
+setScoreboard()
+function setScoreboard(){
+    currentWins = localStorage.getItem('wins')
+        document.getElementById('wins').innerHTML = 'Wins: ' + currentWins
+    currentLosses = localStorage.getItem('losses')
+         document.getElementById('losses').innerHTML = 'Losses: ' + currentLosses   
+}
+
 function getApi() {
     let requestUrl = 'https://random-word-api.herokuapp.com/word;'
 
@@ -100,20 +108,53 @@ function gamePlay() {
          if ((remaining >= 0) && (wordBlanks===compare)){
             //alert('you won')
             wins++
+            timer.textContent = 'winner winner chicken dinner'
             console.log('Wins:', wins)
+            document.getElementById('wordBlanks').innerHTML = dataString
             document.getElementById('wins').innerHTML = 'Wins: ' + wins
-            
+            reset()
 
          }
          else if (remaining === 0){
             //alert('game over')
             console.log('Losses:', losses)
             losses++
-            alert('haha loserrr')
+            //alert('haha loserrr')
             timer.textContent = 'you suck';
             document.getElementById('wordBlanks').innerHTML = dataString
             document.getElementById('losses').innerHTML = 'Losses: ' + losses
-        }}
+            reset()     
+         }
+        
+        localStorage.setItem('wins', wins)
+        localStorage.setItem('losses', losses)
+        
+        }
+ var resetStorage = document.getElementById('reset')
+resetStorage.addEventListener('click', resetScore);
+
+function resetScore(event){
+    localStorage.removeItem('wins')
+    localStorage.setItem('wins', 0)
+    currentWins = localStorage.getItem('wins')
+    document.getElementById('wins').innerHTML = 'Wins: ' + currentWins
+    
+    localStorage.removeItem('losses')
+    localStorage.setItem('losses', 0)
+    currentLosses = localStorage.getItem('losses')
+         document.getElementById('losses').innerHTML = 'Losses: ' + currentLosses 
+   
+    console.log("resetScore")
+ }
+   
+        
+function reset (event){
+    startButton.addEventListener('click', startGame)
+    getApi()
+    alphabet = 'a b c d e f g h i j k l m n o p q r s t u v w x y z';
+    document.getElementById('alphabet').innerHTML = alphabet
+    
+}
 
 
 function replaceAt(str, idx, code)
